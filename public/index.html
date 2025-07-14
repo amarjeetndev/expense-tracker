@@ -6,12 +6,12 @@
     <title>Monthly Expense Tracker</title>
     <style>
         :root {
-            --primary-color: #3498db;
-            --secondary-color: #2980b9;
-            --accent-color: #e74c3c;
-            --light-color: #ecf0f1;
-            --dark-color: #2c3e50;
-            --success-color: #2ecc71;
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --danger: #f72585;
+            --success: #4cc9f0;
+            --light: #f8f9fa;
+            --dark: #212529;
         }
         
         * {
@@ -23,7 +23,7 @@
         
         body {
             background-color: #f5f7fa;
-            color: #333;
+            color: var(--dark);
             line-height: 1.6;
         }
         
@@ -34,7 +34,7 @@
         }
         
         header {
-            background-color: var(--primary-color);
+            background-color: var(--primary);
             color: white;
             padding: 20px 0;
             text-align: center;
@@ -63,7 +63,7 @@
         }
         
         .tab.active {
-            background-color: var(--primary-color);
+            background-color: var(--primary);
             color: white;
         }
         
@@ -98,7 +98,7 @@
         }
         
         button {
-            background-color: var(--primary-color);
+            background-color: var(--primary);
             color: white;
             border: none;
             padding: 10px 20px;
@@ -109,7 +109,7 @@
         }
         
         button:hover {
-            background-color: var(--secondary-color);
+            background-color: var(--secondary);
         }
         
         table {
@@ -125,7 +125,7 @@
         }
         
         th {
-            background-color: var(--primary-color);
+            background-color: var(--primary);
             color: white;
         }
         
@@ -146,7 +146,7 @@
         }
         
         .summary-card h3 {
-            color: var(--primary-color);
+            color: var(--primary);
             margin-bottom: 15px;
         }
         
@@ -172,12 +172,13 @@
             gap: 10px;
         }
         
-        .admin-panel {
-            background-color: var(--dark-color);
-            color: white;
-            padding: 15px;
-            border-radius: 5px;
-            margin-bottom: 20px;
+        .error-message {
+            color: var(--danger);
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid var(--danger);
+            border-radius: 4px;
+            display: none;
         }
         
         @media (max-width: 768px) {
@@ -203,23 +204,24 @@
         <div class="tabs">
             <div class="tab active" data-tab="data-entry">Data Entry</div>
             <div class="tab" data-tab="reports">Reports</div>
-            <div class="tab" data-tab="admin">Admin Dashboard</div>
         </div>
         
         <!-- Data Entry Tab -->
         <div class="tab-content active" id="data-entry">
+            <div id="error-message" class="error-message"></div>
+            
             <div class="form-group">
                 <label for="month">Select Month:</label>
                 <select id="month">
-                    <option value="1">January</option>
-                    <option value="2">February</option>
-                    <option value="3">March</option>
-                    <option value="4">April</option>
-                    <option value="5">May</option>
-                    <option value="6">June</option>
-                    <option value="7">July</option>
-                    <option value="8">August</option>
-                    <option value="9">September</option>
+                    <option value="01">January</option>
+                    <option value="02">February</option>
+                    <option value="03">March</option>
+                    <option value="04">April</option>
+                    <option value="05">May</option>
+                    <option value="06">June</option>
+                    <option value="07">July</option>
+                    <option value="08">August</option>
+                    <option value="09">September</option>
                     <option value="10">October</option>
                     <option value="11">November</option>
                     <option value="12">December</option>
@@ -341,81 +343,13 @@
                 </table>
             </div>
         </div>
-        
-        <!-- Admin Dashboard Tab -->
-        <div class="tab-content" id="admin">
-            <div class="admin-panel">
-                <h3>Admin Dashboard</h3>
-                <p>Manage all user data and system settings</p>
-            </div>
-            
-            <div class="form-group">
-                <label for="admin-year">Select Year:</label>
-                <select id="admin-year">
-                    <option value="2023">2023</option>
-                    <option value="2024">2024</option>
-                </select>
-            </div>
-            
-            <div class="summary-card">
-                <h3>System Statistics</h3>
-                <div class="summary-grid">
-                    <div>
-                        <h4>Total Users</h4>
-                        <p id="total-users">0</p>
-                    </div>
-                    <div>
-                        <h4>Total Records</h4>
-                        <p id="total-records">0</p>
-                    </div>
-                    <div>
-                        <h4>Avg. Monthly Salary</h4>
-                        <p id="admin-avg-salary">₹0</p>
-                    </div>
-                    <div>
-                        <h4>Avg. Monthly Expenses</h4>
-                        <p id="admin-avg-expenses">₹0</p>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="summary-card">
-                <h3>User Management</h3>
-                <table id="users-table">
-                    <thead>
-                        <tr>
-                            <th>User ID</th>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Records</th>
-                            <th>Last Active</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Data will be inserted here by JavaScript -->
-                    </tbody>
-                </table>
-            </div>
-            
-            <div class="summary-card">
-                <h3>Data Export</h3>
-                <button id="export-csv">Export to CSV</button>
-                <button id="export-json">Export to JSON</button>
-                <button id="export-pdf">Export to PDF</button>
-            </div>
-        </div>
     </div>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        // Sample data structure
-        let expensesData = {
-            "2023": {
-                "1": { salary: 50000, emi: 15000, food: 8000, fuel: 3000, parents: 5000, other: 2000 },
-                "2": { salary: 50000, emi: 15000, food: 7500, fuel: 3500, parents: 5000, other: 2500 }
-            }
-        };
+        // API Configuration
+        const API_BASE_URL = 'https://expense-tracker-backend-djyp.onrender.com';
+        const USER_ID = '1'; // Default user ID
         
         // DOM Elements
         const tabs = document.querySelectorAll('.tab');
@@ -424,8 +358,7 @@
         const updateBtn = document.getElementById('update-btn');
         const monthSelect = document.getElementById('month');
         const yearInput = document.getElementById('year');
-        const reportYearSelect = document.getElementById('report-year');
-        const adminYearSelect = document.getElementById('admin-year');
+        const errorMessage = document.getElementById('error-message');
         
         // Initialize Charts
         const monthlyChartCtx = document.getElementById('monthlyChart').getContext('2d');
@@ -439,17 +372,17 @@
                     {
                         label: 'Salary',
                         data: [],
-                        backgroundColor: 'rgba(52, 152, 219, 0.7)'
+                        backgroundColor: 'rgba(67, 97, 238, 0.7)'
                     },
                     {
                         label: 'Expenses',
                         data: [],
-                        backgroundColor: 'rgba(231, 76, 60, 0.7)'
+                        backgroundColor: 'rgba(247, 37, 133, 0.7)'
                     },
                     {
                         label: 'Balance',
                         data: [],
-                        backgroundColor: 'rgba(46, 204, 113, 0.7)'
+                        backgroundColor: 'rgba(76, 201, 240, 0.7)'
                     }
                 ]
             },
@@ -470,11 +403,11 @@
                 datasets: [{
                     data: [],
                     backgroundColor: [
-                        'rgba(52, 152, 219, 0.7)',
-                        'rgba(155, 89, 182, 0.7)',
-                        'rgba(241, 196, 15, 0.7)',
-                        'rgba(230, 126, 34, 0.7)',
-                        'rgba(46, 204, 113, 0.7)'
+                        'rgba(67, 97, 238, 0.7)',
+                        'rgba(63, 55, 201, 0.7)',
+                        'rgba(247, 37, 133, 0.7)',
+                        'rgba(76, 201, 240, 0.7)',
+                        'rgba(33, 37, 41, 0.7)'
                     ]
                 }]
             },
@@ -494,17 +427,15 @@
                 
                 if (tab.dataset.tab === 'reports') {
                     updateReports();
-                } else if (tab.dataset.tab === 'admin') {
-                    updateAdminDashboard();
                 }
             });
         });
         
-        // Form Submission
+        // Save/Update Data
         saveBtn.addEventListener('click', saveData);
         updateBtn.addEventListener('click', updateData);
         
-        // Navigation
+        // Report Navigation
         document.getElementById('prev-year').addEventListener('click', () => {
             reportYearSelect.value = parseInt(reportYearSelect.value) - 1;
             updateReports();
@@ -515,22 +446,71 @@
             updateReports();
         });
         
-        // Month Selection - Load existing data if available
+        // Load month data when selected
         monthSelect.addEventListener('change', loadMonthData);
         yearInput.addEventListener('change', loadMonthData);
         
-        // Initialize
-        loadMonthData();
-        updateReports();
-        updateAdminDashboard();
+        // API Functions
+        async function saveData() {
+            const month = monthSelect.value;
+            const year = yearInput.value;
+            const salary = parseFloat(document.getElementById('salary').value) || 0;
+            const emi = parseFloat(document.getElementById('emi').value) || 0;
+            const food = parseFloat(document.getElementById('food').value) || 0;
+            const fuel = parseFloat(document.getElementById('fuel').value) || 0;
+            const parents = parseFloat(document.getElementById('parents').value) || 0;
+            const other = parseFloat(document.getElementById('other').value) || 0;
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/expenses`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        userId: USER_ID,
+                        year,
+                        month,
+                        data: { salary, emi, food, fuel, parents, other }
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(await response.text());
+                }
+                
+                showSuccess('Data saved successfully!');
+                loadMonthData();
+            } catch (error) {
+                showError(`Save failed: ${error.message}`);
+            }
+        }
         
-        // Functions
-        function loadMonthData() {
+        async function updateData() {
+            await saveData(); // Same as save for this implementation
+        }
+        
+        async function loadMonthData() {
             const month = monthSelect.value;
             const year = yearInput.value;
             
-            if (expensesData[year] && expensesData[year][month]) {
-                const data = expensesData[year][month];
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/expenses/${USER_ID}/${year}/${month}`);
+                if (!response.ok) {
+                    // No data exists for this month yet
+                    document.getElementById('salary').value = '';
+                    document.getElementById('emi').value = '';
+                    document.getElementById('food').value = '';
+                    document.getElementById('fuel').value = '';
+                    document.getElementById('parents').value = '';
+                    document.getElementById('other').value = '';
+                    
+                    saveBtn.style.display = 'inline-block';
+                    updateBtn.style.display = 'none';
+                    return;
+                }
+                
+                const data = await response.json();
                 document.getElementById('salary').value = data.salary;
                 document.getElementById('emi').value = data.emi;
                 document.getElementById('food').value = data.food;
@@ -540,243 +520,133 @@
                 
                 saveBtn.style.display = 'none';
                 updateBtn.style.display = 'inline-block';
-            } else {
-                document.getElementById('salary').value = '';
-                document.getElementById('emi').value = '';
-                document.getElementById('food').value = '';
-                document.getElementById('fuel').value = '';
-                document.getElementById('parents').value = '';
-                document.getElementById('other').value = '';
-                
-                saveBtn.style.display = 'inline-block';
-                updateBtn.style.display = 'none';
+            } catch (error) {
+                showError(`Failed to load data: ${error.message}`);
             }
         }
         
-        function saveData() {
-            const month = monthSelect.value;
-            const year = yearInput.value;
-            const salary = parseFloat(document.getElementById('salary').value) || 0;
-            const emi = parseFloat(document.getElementById('emi').value) || 0;
-            const food = parseFloat(document.getElementById('food').value) || 0;
-            const fuel = parseFloat(document.getElementById('fuel').value) || 0;
-            const parents = parseFloat(document.getElementById('parents').value) || 0);
-            const other = parseFloat(document.getElementById('other').value) || 0;
+        async function updateReports() {
+            const year = document.getElementById('report-year').value;
             
-            if (!expensesData[year]) {
-                expensesData[year] = {};
-            }
-            
-            expensesData[year][month] = {
-                salary, emi, food, fuel, parents, other
-            };
-            
-            alert('Data saved successfully!');
-            loadMonthData();
-            updateReports();
-        }
-        
-        function updateData() {
-            saveData(); // Same as save for this simple implementation
-        }
-        
-        function updateReports() {
-            const year = reportYearSelect.value;
-            const yearData = expensesData[year] || {};
-            
-            // Update summary
-            let totalSalary = 0;
-            let totalExpenses = 0;
-            let monthlyData = Array(12).fill(0).map((_, i) => {
-                const month = (i + 1).toString();
-                if (yearData[month]) {
-                    const data = yearData[month];
-                    const expenses = data.emi + data.food + data.fuel + data.parents + data.other;
-                    const balance = data.salary - expenses;
-                    
-                    totalSalary += data.salary;
-                    totalExpenses += expenses;
-                    
-                    return {
-                        salary: data.salary,
-                        expenses: expenses,
-                        balance: balance
-                    };
-                } else {
-                    return {
-                        salary: 0,
-                        expenses: 0,
-                        balance: 0
-                    };
+            try {
+                // Fetch report data
+                const response = await fetch(`${API_BASE_URL}/api/reports/${USER_ID}/${year}`);
+                if (!response.ok) {
+                    throw new Error(await response.text());
                 }
-            });
-            
-            document.getElementById('total-salary').textContent = `₹${totalSalary.toLocaleString()}`;
-            document.getElementById('total-expenses').textContent = `₹${totalExpenses.toLocaleString()}`;
-            document.getElementById('total-savings').textContent = `₹${(totalSalary - totalExpenses).toLocaleString()}`;
-            document.getElementById('avg-savings').textContent = `₹${((totalSalary - totalExpenses) / 12).toLocaleString()}`;
-            
-            // Update charts
-            monthlyChart.data.datasets[0].data = monthlyData.map(m => m.salary);
-            monthlyChart.data.datasets[1].data = monthlyData.map(m => m.expenses);
-            monthlyChart.data.datasets[2].data = monthlyData.map(m => m.balance);
-            monthlyChart.update();
-            
-            // Update expense distribution (sum across all months)
-            const expenseCategories = ['emi', 'food', 'fuel', 'parents', 'other'];
-            const expenseSums = expenseCategories.map(cat => {
-                return Object.values(yearData).reduce((sum, month) => sum + (month[cat] || 0), 0);
-            });
-            
-            expenseChart.data.datasets[0].data = expenseSums;
-            expenseChart.update();
-            
-            // Update records table
-            const tableBody = document.querySelector('#records-table tbody');
-            tableBody.innerHTML = '';
-            
-            for (let i = 1; i <= 12; i++) {
-                const month = i.toString();
+                
+                const reportData = await response.json();
+                const yearData = reportData[year] || { totalSalary: 0, totalExpenses: 0, months: {} };
+                
+                // Update summary
+                document.getElementById('total-salary').textContent = `₹${yearData.totalSalary.toLocaleString()}`;
+                document.getElementById('total-expenses').textContent = `₹${yearData.totalExpenses.toLocaleString()}`;
+                document.getElementById('total-savings').textContent = `₹${(yearData.totalSalary - yearData.totalExpenses).toLocaleString()}`;
+                document.getElementById('avg-savings').textContent = `₹${Math.round((yearData.totalSalary - yearData.totalExpenses) / 12).toLocaleString()}`;
+                
+                // Update monthly chart
+                monthlyChart.data.datasets[0].data = Object.values(yearData.months).map(m => m.salary);
+                monthlyChart.data.datasets[1].data = Object.values(yearData.months).map(m => m.expenses);
+                monthlyChart.data.datasets[2].data = Object.values(yearData.months).map(m => m.balance);
+                monthlyChart.update();
+                
+                // Update expense distribution chart
+                const expenseCategories = ['emi', 'food', 'fuel', 'parents', 'other'];
+                const expenseSums = expenseCategories.map(cat => {
+                    return Object.values(yearData.months).reduce((sum, month) => {
+                        return sum + (month.categories[cat] || 0);
+                    }, 0);
+                });
+                
+                expenseChart.data.datasets[0].data = expenseSums;
+                expenseChart.update();
+                
+                // Update records table
+                const tableBody = document.querySelector('#records-table tbody');
+                tableBody.innerHTML = '';
+                
                 const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-                const row = document.createElement('tr');
                 
-                if (yearData[month]) {
-                    const data = yearData[month];
-                    const expenses = data.emi + data.food + data.fuel + data.parents + data.other;
-                    const balance = data.salary - expenses;
+                for (let i = 1; i <= 12; i++) {
+                    const month = i.toString().padStart(2, '0');
+                    const row = document.createElement('tr');
                     
-                    row.innerHTML = `
-                        <td>${monthNames[i-1]}</td>
-                        <td>₹${data.salary.toLocaleString()}</td>
-                        <td>₹${data.emi.toLocaleString()}</td>
-                        <td>₹${data.food.toLocaleString()}</td>
-                        <td>₹${data.fuel.toLocaleString()}</td>
-                        <td>₹${data.parents.toLocaleString()}</td>
-                        <td>₹${data.other.toLocaleString()}</td>
-                        <td>₹${balance.toLocaleString()}</td>
-                        <td>
-                            <button class="edit-btn" data-month="${month}">Edit</button>
-                            <button class="delete-btn" data-month="${month}">Delete</button>
-                        </td>
-                    `;
-                } else {
-                    row.innerHTML = `
-                        <td>${monthNames[i-1]}</td>
-                        <td>-</td>
-                        <td>-</td>
-                        <td>-</td>
-                        <td>-</td>
-                        <td>-</td>
-                        <td>-</td>
-                        <td>-</td>
-                        <td>
-                            <button class="add-btn" data-month="${month}">Add</button>
-                        </td>
-                    `;
+                    if (yearData.months[month]) {
+                        const data = yearData.months[month];
+                        const balance = data.salary - data.expenses;
+                        
+                        row.innerHTML = `
+                            <td>${monthNames[i-1]}</td>
+                            <td>₹${data.salary.toLocaleString()}</td>
+                            <td>₹${data.categories.emi.toLocaleString()}</td>
+                            <td>₹${data.categories.food.toLocaleString()}</td>
+                            <td>₹${data.categories.fuel.toLocaleString()}</td>
+                            <td>₹${data.categories.parents.toLocaleString()}</td>
+                            <td>₹${data.categories.other.toLocaleString()}</td>
+                            <td>₹${balance.toLocaleString()}</td>
+                            <td>
+                                <button class="edit-btn" data-month="${month}">Edit</button>
+                            </td>
+                        `;
+                    } else {
+                        row.innerHTML = `
+                            <td>${monthNames[i-1]}</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>
+                                <button class="add-btn" data-month="${month}">Add</button>
+                            </td>
+                        `;
+                    }
+                    
+                    tableBody.appendChild(row);
                 }
                 
-                tableBody.appendChild(row);
+                // Add event listeners to action buttons
+                document.querySelectorAll('.edit-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        monthSelect.value = btn.dataset.month;
+                        yearInput.value = year;
+                        loadMonthData();
+                        document.querySelector('.tab.active').click();
+                    });
+                });
+                
+                document.querySelectorAll('.add-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        monthSelect.value = btn.dataset.month;
+                        yearInput.value = year;
+                        document.getElementById('salary').focus();
+                        document.querySelector('.tab.active').click();
+                    });
+                });
+                
+            } catch (error) {
+                showError(`Failed to load reports: ${error.message}`);
             }
-            
-            // Add event listeners to action buttons
-            document.querySelectorAll('.edit-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    monthSelect.value = btn.dataset.month;
-                    yearInput.value = year;
-                    loadMonthData();
-                    document.querySelector('.tab.active').click();
-                });
-            });
-            
-            document.querySelectorAll('.delete-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    if (confirm('Are you sure you want to delete this record?')) {
-                        delete expensesData[year][btn.dataset.month];
-                        updateReports();
-                    }
-                });
-            });
-            
-            document.querySelectorAll('.add-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    monthSelect.value = btn.dataset.month;
-                    yearInput.value = year;
-                    document.getElementById('salary').focus();
-                    document.querySelector('.tab.active').click();
-                });
-            });
         }
         
-        function updateAdminDashboard() {
-            // In a real app, this would fetch data from the server
-            document.getElementById('total-users').textContent = '1';
-            document.getElementById('total-records').textContent = Object.keys(expensesData).reduce((sum, year) => {
-                return sum + Object.keys(expensesData[year]).length;
-            }, 0);
-            
-            // Calculate averages
-            let totalSalary = 0;
-            let totalExpenses = 0;
-            let recordCount = 0;
-            
-            for (const year in expensesData) {
-                for (const month in expensesData[year]) {
-                    const data = expensesData[year][month];
-                    totalSalary += data.salary;
-                    totalExpenses += data.emi + data.food + data.fuel + data.parents + data.other;
-                    recordCount++;
-                }
-            }
-            
-            document.getElementById('admin-avg-salary').textContent = 
-                recordCount > 0 ? `₹${Math.round(totalSalary / recordCount).toLocaleString()}` : '₹0';
-            document.getElementById('admin-avg-expenses').textContent = 
-                recordCount > 0 ? `₹${Math.round(totalExpenses / recordCount).toLocaleString()}` : '₹0';
-            
-            // Update users table (simplified for demo)
-            const usersTableBody = document.querySelector('#users-table tbody');
-            usersTableBody.innerHTML = `
-                <tr>
-                    <td>1</td>
-                    <td>Demo User</td>
-                    <td>user@example.com</td>
-                    <td>${Object.keys(expensesData).reduce((sum, year) => sum + Object.keys(expensesData[year]).length, 0)}</td>
-                    <td>Today</td>
-                    <td>
-                        <button>View</button>
-                        <button>Edit</button>
-                    </td>
-                </tr>
-            `;
-            
-            // Export buttons
-            document.getElementById('export-csv').addEventListener('click', exportToCSV);
-            document.getElementById('export-json').addEventListener('click', exportToJSON);
-            document.getElementById('export-pdf').addEventListener('click', exportToPDF);
+        // Helper functions
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+            setTimeout(() => {
+                errorMessage.style.display = 'none';
+            }, 5000);
         }
         
-        function exportToCSV() {
-            // In a real app, this would generate a proper CSV file
-            alert('CSV export would be generated here');
+        function showSuccess(message) {
+            alert(message); // In a real app, replace with a nicer notification
         }
         
-        function exportToJSON() {
-            // In a real app, this would generate a proper JSON file
-            const dataStr = JSON.stringify(expensesData, null, 2);
-            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-            
-            const exportFileDefaultName = 'expenses-data.json';
-            
-            const linkElement = document.createElement('a');
-            linkElement.setAttribute('href', dataUri);
-            linkElement.setAttribute('download', exportFileDefaultName);
-            linkElement.click();
-        }
-        
-        function exportToPDF() {
-            // In a real app, this would generate a proper PDF
-            alert('PDF export would be generated here');
-        }
+        // Initialize
+        loadMonthData();
+        updateReports();
     </script>
 </body>
 </html>
