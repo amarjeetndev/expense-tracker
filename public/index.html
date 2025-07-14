@@ -358,7 +358,10 @@
         const updateBtn = document.getElementById('update-btn');
         const monthSelect = document.getElementById('month');
         const yearInput = document.getElementById('year');
+        const reportYearSelect = document.getElementById('report-year');
         const errorMessage = document.getElementById('error-message');
+        const prevYearBtn = document.getElementById('prev-year');
+        const nextYearBtn = document.getElementById('next-year');
         
         // Initialize Charts
         const monthlyChartCtx = document.getElementById('monthlyChart').getContext('2d');
@@ -436,12 +439,12 @@
         updateBtn.addEventListener('click', updateData);
         
         // Report Navigation
-        document.getElementById('prev-year').addEventListener('click', () => {
+        prevYearBtn.addEventListener('click', () => {
             reportYearSelect.value = parseInt(reportYearSelect.value) - 1;
             updateReports();
         });
         
-        document.getElementById('next-year').addEventListener('click', () => {
+        nextYearBtn.addEventListener('click', () => {
             reportYearSelect.value = parseInt(reportYearSelect.value) + 1;
             updateReports();
         });
@@ -496,27 +499,19 @@
             
             try {
                 const response = await fetch(`${API_BASE_URL}/api/expenses/${USER_ID}/${year}/${month}`);
-                if (!response.ok) {
+                
+                if (response.status === 404) {
                     // No data exists for this month yet
-                    document.getElementById('salary').value = '';
-                    document.getElementById('emi').value = '';
-                    document.getElementById('food').value = '';
-                    document.getElementById('fuel').value = '';
-                    document.getElementById('parents').value = '';
-                    document.getElementById('other').value = '';
-                    
-                    saveBtn.style.display = 'inline-block';
-                    updateBtn.style.display = 'none';
+                    resetForm();
                     return;
                 }
                 
+                if (!response.ok) {
+                    throw new Error(await response.text());
+                }
+                
                 const data = await response.json();
-                document.getElementById('salary').value = data.salary;
-                document.getElementById('emi').value = data.emi;
-                document.getElementById('food').value = data.food;
-                document.getElementById('fuel').value = data.fuel;
-                document.getElementById('parents').value = data.parents;
-                document.getElementById('other').value = data.other;
+                populateForm(data);
                 
                 saveBtn.style.display = 'none';
                 updateBtn.style.display = 'inline-block';
@@ -525,8 +520,29 @@
             }
         }
         
+        function resetForm() {
+            document.getElementById('salary').value = '';
+            document.getElementById('emi').value = '';
+            document.getElementById('food').value = '';
+            document.getElementById('fuel').value = '';
+            document.getElementById('parents').value = '';
+            document.getElementById('other').value = '';
+            
+            saveBtn.style.display = 'inline-block';
+            updateBtn.style.display = 'none';
+        }
+        
+        function populateForm(data) {
+            document.getElementById('salary').value = data.salary || '';
+            document.getElementById('emi').value = data.emi || '';
+            document.getElementById('food').value = data.food || '';
+            document.getElementById('fuel').value = data.fuel || '';
+            document.getElementById('parents').value = data.parents || '';
+            document.getElementById('other').value = data.other || '';
+        }
+        
         async function updateReports() {
-            const year = document.getElementById('report-year').value;
+            const year = reportYearSelect.value;
             
             try {
                 // Fetch report data
@@ -613,7 +629,7 @@
                         monthSelect.value = btn.dataset.month;
                         yearInput.value = year;
                         loadMonthData();
-                        document.querySelector('.tab.active').click();
+                        document.querySelector('.tab[data-tab="data-entry"]').click();
                     });
                 });
                 
@@ -622,7 +638,7 @@
                         monthSelect.value = btn.dataset.month;
                         yearInput.value = year;
                         document.getElementById('salary').focus();
-                        document.querySelector('.tab.active').click();
+                        document.querySelector('.tab[data-tab="data-entry"]').click();
                     });
                 });
                 
