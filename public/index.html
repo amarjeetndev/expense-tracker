@@ -41,252 +41,710 @@
             text-align: center;
             margin-bottom: 30px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            position: relative;
         }
         
-        .admin-badge {
-            position: absolute;
-            top: 10px;
-            right: 20px;
-            background-color: var(--admin);
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-        }
-        
-        .login-form {
-            background-color: white;
-            max-width: 400px;
-            margin: 50px auto;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        
-        .login-form h2 {
+        .tabs {
+            display: flex;
             margin-bottom: 20px;
-            color: var(--primary);
-            text-align: center;
+            border-bottom: 1px solid #ddd;
         }
         
-        .login-form input {
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #f1f1f1;
+            border: 1px solid #ddd;
+            border-bottom: none;
+            margin-right: 5px;
+            border-radius: 5px 5px 0 0;
+        }
+        
+        .tab.active {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 20px;
+            background-color: white;
+            border-radius: 0 0 5px 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        input, select {
             width: 100%;
             padding: 10px;
-            margin-bottom: 15px;
             border: 1px solid #ddd;
             border-radius: 4px;
+            font-size: 16px;
         }
         
-        .login-form button {
-            width: 100%;
-            padding: 10px;
+        button {
             background-color: var(--primary);
             color: white;
             border: none;
+            padding: 10px 20px;
             border-radius: 4px;
             cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
         }
         
-        /* [Rest of your existing styles remain the same] */
+        button:hover {
+            background-color: var(--secondary);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        
+        tr:hover {
+            background-color: #e9e9e9;
+        }
+        
+        .summary-card {
+            background-color: white;
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .summary-card h3 {
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+        
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .chart-container {
+            height: 300px;
+            margin-top: 20px;
+        }
+        
+        .month-selector {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        
+        .month-nav {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .error-message {
+            color: var(--danger);
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid var(--danger);
+            border-radius: 4px;
+            display: none;
+        }
+        
+        .admin-panel {
+            background-color: var(--admin);
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .month-selector {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
     </style>
 </head>
 <body>
-    <div id="login-screen" class="login-form">
-        <h2>Admin Login</h2>
-        <input type="text" id="admin-username" placeholder="Username">
-        <input type="password" id="admin-password" placeholder="Password">
-        <button id="login-btn">Login</button>
-        <p id="login-error" style="color: var(--danger); margin-top: 10px; display: none;"></p>
-    </div>
-
-    <div id="app-content" style="display: none;">
-        <header>
-            <h1>Monthly Expense Tracker</h1>
-            <div class="admin-badge" id="admin-badge">Admin Mode</div>
-        </header>
+    <header>
+        <h1>Monthly Expense Tracker</h1>
+    </header>
+    
+    <div class="container">
+        <div class="tabs">
+            <div class="tab active" data-tab="data-entry">Data Entry</div>
+            <div class="tab" data-tab="reports">Reports</div>
+            <div class="tab" data-tab="admin">Admin</div>
+        </div>
         
-        <div class="container">
-            <div class="tabs">
-                <div class="tab active" data-tab="data-entry">Data Entry</div>
-                <div class="tab" data-tab="reports">Reports</div>
-                <div class="tab" data-tab="admin">Admin</div>
+        <!-- Data Entry Tab -->
+        <div class="tab-content active" id="data-entry">
+            <div id="error-message" class="error-message"></div>
+            
+            <div class="form-group">
+                <label for="month">Select Month:</label>
+                <select id="month">
+                    <option value="01">January</option>
+                    <option value="02">February</option>
+                    <option value="03">March</option>
+                    <option value="04">April</option>
+                    <option value="05">May</option>
+                    <option value="06">June</option>
+                    <option value="07">July</option>
+                    <option value="08">August</option>
+                    <option value="09">September</option>
+                    <option value="10">October</option>
+                    <option value="11">November</option>
+                    <option value="12">December</option>
+                </select>
             </div>
             
-            <!-- Data Entry Tab -->
-            <div class="tab-content active" id="data-entry">
-                <!-- [Your existing data entry form] -->
+            <div class="form-group">
+                <label for="year">Year:</label>
+                <input type="number" id="year" min="2000" max="2100" value="2023">
             </div>
             
-            <!-- Reports Tab -->
-            <div class="tab-content" id="reports">
-                <!-- [Your existing reports section] -->
+            <div class="form-group">
+                <label for="salary">Monthly Salary:</label>
+                <input type="number" id="salary" placeholder="Enter your monthly salary">
             </div>
             
-            <!-- Admin Tab -->
-            <div class="tab-content" id="admin">
+            <h3>Expenses</h3>
+            
+            <div class="form-group">
+                <label for="emi">EMI:</label>
+                <input type="number" id="emi" placeholder="Enter EMI amount">
+            </div>
+            
+            <div class="form-group">
+                <label for="food">Food:</label>
+                <input type="number" id="food" placeholder="Enter food expenses">
+            </div>
+            
+            <div class="form-group">
+                <label for="fuel">Fuel:</label>
+                <input type="number" id="fuel" placeholder="Enter fuel expenses">
+            </div>
+            
+            <div class="form-group">
+                <label for="parents">Parents:</label>
+                <input type="number" id="parents" placeholder="Enter amount sent to parents">
+            </div>
+            
+            <div class="form-group">
+                <label for="other">Other Expenses:</label>
+                <input type="number" id="other" placeholder="Enter other expenses">
+            </div>
+            
+            <button id="save-btn">Save Data</button>
+            <button id="update-btn" style="display: none;">Update Data</button>
+        </div>
+        
+        <!-- Reports Tab -->
+        <div class="tab-content" id="reports">
+            <div class="month-selector">
+                <div>
+                    <label for="report-year">Select Year:</label>
+                    <select id="report-year">
+                        <option value="2023">2023</option>
+                        <option value="2024">2024</option>
+                    </select>
+                </div>
+                <div class="month-nav">
+                    <button id="prev-year">&lt;&lt; Prev Year</button>
+                    <button id="next-year">Next Year &gt;&gt;</button>
+                </div>
+            </div>
+            
+            <div class="summary-card">
+                <h3>Annual Summary</h3>
+                <div class="summary-grid">
+                    <div>
+                        <h4>Total Salary</h4>
+                        <p id="total-salary">₹0</p>
+                    </div>
+                    <div>
+                        <h4>Total Expenses</h4>
+                        <p id="total-expenses">₹0</p>
+                    </div>
+                    <div>
+                        <h4>Total Savings</h4>
+                        <p id="total-savings">₹0</p>
+                    </div>
+                    <div>
+                        <h4>Average Monthly Savings</h4>
+                        <p id="avg-savings">₹0</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="summary-card">
+                <h3>Monthly Breakdown</h3>
+                <div class="chart-container">
+                    <canvas id="monthlyChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="summary-card">
+                <h3>Expense Distribution</h3>
+                <div class="chart-container">
+                    <canvas id="expenseChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="summary-card">
+                <h3>Detailed Records</h3>
+                <table id="records-table">
+                    <thead>
+                        <tr>
+                            <th>Month</th>
+                            <th>Salary</th>
+                            <th>EMI</th>
+                            <th>Food</th>
+                            <th>Fuel</th>
+                            <th>Parents</th>
+                            <th>Other</th>
+                            <th>Balance</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Data will be inserted here by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Admin Tab -->
+        <div class="tab-content" id="admin">
+            <div class="admin-panel">
+                <h3>Admin Dashboard</h3>
+                <p>Enter admin password to unlock features:</p>
+                <input type="password" id="admin-password" placeholder="Admin password">
+                <button id="admin-login">Login</button>
+                <p id="admin-error" style="color: var(--danger); margin-top: 10px; display: none;"></p>
+            </div>
+            
+            <div id="admin-features" style="display: none;">
                 <div class="summary-card">
-                    <h3>System Overview</h3>
+                    <h3>System Statistics</h3>
                     <div class="summary-grid">
                         <div>
                             <h4>Total Users</h4>
-                            <p id="total-users">Loading...</p>
+                            <p id="total-users">0</p>
                         </div>
                         <div>
                             <h4>Total Records</h4>
-                            <p id="total-records">Loading...</p>
+                            <p id="total-records">0</p>
                         </div>
                         <div>
-                            <h4>Server Status</h4>
-                            <p id="server-status">Loading...</p>
+                            <h4>Avg. Monthly Salary</h4>
+                            <p id="admin-avg-salary">₹0</p>
+                        </div>
+                        <div>
+                            <h4>Avg. Monthly Expenses</h4>
+                            <p id="admin-avg-expenses">₹0</p>
                         </div>
                     </div>
                 </div>
                 
                 <div class="summary-card">
-                    <h3>Data Management</h3>
-                    <button id="export-data">Export All Data</button>
-                    <button id="backup-db">Create Backup</button>
+                    <h3>Data Export</h3>
+                    <button id="export-csv">Export to CSV</button>
+                    <button id="export-json">Export to JSON</button>
                 </div>
             </div>
         </div>
     </div>
-
+    
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         // API Configuration
         const API_BASE_URL = 'https://expense-tracker-backend-djyp.onrender.com';
         const USER_ID = '1';
-        const ADMIN_CREDENTIALS = {
-            username: 'admin',
-            password: 'admin123' // In production, use proper authentication
+        const ADMIN_PASSWORD = 'admin123'; // Change this in production
+        
+        // Sample data structure
+        let expensesData = {
+            "2023": {
+                "1": { salary: 50000, emi: 15000, food: 8000, fuel: 3000, parents: 5000, other: 2000 },
+                "2": { salary: 50000, emi: 15000, food: 7500, fuel: 3500, parents: 5000, other: 2500 }
+            },
+            "2024": {}
         };
         
-        // State Management
-        let isAdmin = false;
-        let availableYears = [];
-        
         // DOM Elements
-        const loginScreen = document.getElementById('login-screen');
-        const appContent = document.getElementById('app-content');
-        const loginBtn = document.getElementById('login-btn');
-        const adminBadge = document.getElementById('admin-badge');
         const tabs = document.querySelectorAll('.tab');
         const tabContents = document.querySelectorAll('.tab-content');
+        const saveBtn = document.getElementById('save-btn');
+        const updateBtn = document.getElementById('update-btn');
+        const monthSelect = document.getElementById('month');
+        const yearInput = document.getElementById('year');
+        const reportYearSelect = document.getElementById('report-year');
+        const prevYearBtn = document.getElementById('prev-year');
+        const nextYearBtn = document.getElementById('next-year');
+        const adminLoginBtn = document.getElementById('admin-login');
+        const adminFeatures = document.getElementById('admin-features');
         
-        // Initialize the application
-        function initApp() {
-            setupLogin();
-            if (isAdmin) {
-                setupAdminFeatures();
+        // Initialize Charts
+        const monthlyChart = new Chart(
+            document.getElementById('monthlyChart').getContext('2d'),
+            {
+                type: 'bar',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                    datasets: [
+                        {
+                            label: 'Salary',
+                            data: [],
+                            backgroundColor: 'rgba(67, 97, 238, 0.7)'
+                        },
+                        {
+                            label: 'Expenses',
+                            data: [],
+                            backgroundColor: 'rgba(247, 37, 133, 0.7)'
+                        },
+                        {
+                            label: 'Balance',
+                            data: [],
+                            backgroundColor: 'rgba(76, 201, 240, 0.7)'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
             }
-            loadAvailableYears();
-            setupEventListeners();
+        );
+        
+        const expenseChart = new Chart(
+            document.getElementById('expenseChart').getContext('2d'),
+            {
+                type: 'pie',
+                data: {
+                    labels: ['EMI', 'Food', 'Fuel', 'Parents', 'Other'],
+                    datasets: [{
+                        data: [],
+                        backgroundColor: [
+                            'rgba(67, 97, 238, 0.7)',
+                            'rgba(63, 55, 201, 0.7)',
+                            'rgba(247, 37, 133, 0.7)',
+                            'rgba(76, 201, 240, 0.7)',
+                            'rgba(33, 37, 41, 0.7)'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true
+                }
+            }
+        );
+        
+        // Tab Switching
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
+                
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.tab).classList.add('active');
+                
+                if (tab.dataset.tab === 'reports') {
+                    updateReports();
+                }
+            });
+        });
+        
+        // Form Submission
+        saveBtn.addEventListener('click', saveData);
+        updateBtn.addEventListener('click', updateData);
+        
+        // Report Navigation
+        prevYearBtn.addEventListener('click', () => {
+            reportYearSelect.value = parseInt(reportYearSelect.value) - 1;
+            updateReports();
+        });
+        
+        nextYearBtn.addEventListener('click', () => {
+            reportYearSelect.value = parseInt(reportYearSelect.value) + 1;
+            updateReports();
+        });
+        
+        // Admin Login
+        adminLoginBtn.addEventListener('click', () => {
+            const password = document.getElementById('admin-password').value;
+            if (password === ADMIN_PASSWORD) {
+                adminFeatures.style.display = 'block';
+                document.getElementById('admin-error').style.display = 'none';
+                updateAdminDashboard();
+            } else {
+                document.getElementById('admin-error').textContent = 'Incorrect password';
+                document.getElementById('admin-error').style.display = 'block';
+            }
+        });
+        
+        // Month Selection - Load existing data if available
+        monthSelect.addEventListener('change', loadMonthData);
+        yearInput.addEventListener('change', loadMonthData);
+        
+        // Initialize
+        loadMonthData();
+        updateReports();
+        
+        // Functions
+        function loadMonthData() {
+            const month = monthSelect.value;
+            const year = yearInput.value;
+            
+            if (expensesData[year] && expensesData[year][month]) {
+                const data = expensesData[year][month];
+                document.getElementById('salary').value = data.salary;
+                document.getElementById('emi').value = data.emi;
+                document.getElementById('food').value = data.food;
+                document.getElementById('fuel').value = data.fuel;
+                document.getElementById('parents').value = data.parents;
+                document.getElementById('other').value = data.other;
+                
+                saveBtn.style.display = 'none';
+                updateBtn.style.display = 'inline-block';
+            } else {
+                document.getElementById('salary').value = '';
+                document.getElementById('emi').value = '';
+                document.getElementById('food').value = '';
+                document.getElementById('fuel').value = '';
+                document.getElementById('parents').value = '';
+                document.getElementById('other').value = '';
+                
+                saveBtn.style.display = 'inline-block';
+                updateBtn.style.display = 'none';
+            }
+        }
+        
+        function saveData() {
+            const month = monthSelect.value;
+            const year = yearInput.value;
+            const salary = parseFloat(document.getElementById('salary').value) || 0;
+            const emi = parseFloat(document.getElementById('emi').value) || 0;
+            const food = parseFloat(document.getElementById('food').value) || 0;
+            const fuel = parseFloat(document.getElementById('fuel').value) || 0;
+            const parents = parseFloat(document.getElementById('parents').value) || 0;
+            const other = parseFloat(document.getElementById('other').value) || 0;
+            
+            if (!expensesData[year]) {
+                expensesData[year] = {};
+            }
+            
+            expensesData[year][month] = {
+                salary, emi, food, fuel, parents, other
+            };
+            
+            alert('Data saved successfully!');
             loadMonthData();
             updateReports();
         }
         
-        // Login System
-        function setupLogin() {
-            loginBtn.addEventListener('click', () => {
-                const username = document.getElementById('admin-username').value;
-                const password = document.getElementById('admin-password').value;
-                
-                if (username === ADMIN_CREDENTIALS.username && 
-                    password === ADMIN_CREDENTIALS.password) {
-                    isAdmin = true;
-                    loginScreen.style.display = 'none';
-                    appContent.style.display = 'block';
-                    adminBadge.style.display = 'block';
-                    initApp();
+        function updateData() {
+            saveData(); // Same as save for this implementation
+        }
+        
+        function updateReports() {
+            const year = reportYearSelect.value;
+            const yearData = expensesData[year] || {};
+            
+            // Update summary
+            let totalSalary = 0;
+            let totalExpenses = 0;
+            let monthlyData = Array(12).fill(0).map((_, i) => {
+                const month = (i + 1).toString();
+                if (yearData[month]) {
+                    const data = yearData[month];
+                    const expenses = data.emi + data.food + data.fuel + data.parents + data.other;
+                    const balance = data.salary - expenses;
+                    
+                    totalSalary += data.salary;
+                    totalExpenses += expenses;
+                    
+                    return {
+                        salary: data.salary,
+                        expenses: expenses,
+                        balance: balance
+                    };
                 } else {
-                    document.getElementById('login-error').textContent = 'Invalid credentials';
-                    document.getElementById('login-error').style.display = 'block';
+                    return {
+                        salary: 0,
+                        expenses: 0,
+                        balance: 0
+                    };
                 }
             });
             
-            // Allow bypass for regular users
-            const bypassLogin = document.createElement('button');
-            bypassLogin.textContent = 'Continue as User';
-            bypassLogin.style.marginTop = '10px';
-            bypassLogin.style.width = '100%';
-            bypassLogin.addEventListener('click', () => {
-                loginScreen.style.display = 'none';
-                appContent.style.display = 'block';
-                adminBadge.style.display = 'none';
-                initApp();
+            document.getElementById('total-salary').textContent = `₹${totalSalary.toLocaleString()}`;
+            document.getElementById('total-expenses').textContent = `₹${totalExpenses.toLocaleString()}`;
+            document.getElementById('total-savings').textContent = `₹${(totalSalary - totalExpenses).toLocaleString()}`;
+            document.getElementById('avg-savings').textContent = `₹${((totalSalary - totalExpenses) / 12).toLocaleString()}`;
+            
+            // Update charts
+            monthlyChart.data.datasets[0].data = monthlyData.map(m => m.salary);
+            monthlyChart.data.datasets[1].data = monthlyData.map(m => m.expenses);
+            monthlyChart.data.datasets[2].data = monthlyData.map(m => m.balance);
+            monthlyChart.update();
+            
+            // Update expense distribution (sum across all months)
+            const expenseCategories = ['emi', 'food', 'fuel', 'parents', 'other'];
+            const expenseSums = expenseCategories.map(cat => {
+                return Object.values(yearData).reduce((sum, month) => sum + (month[cat] || 0), 0);
             });
-            loginScreen.appendChild(bypassLogin);
-        }
-        
-        // Admin Features
-        function setupAdminFeatures() {
-            // Load admin data
-            fetchAdminData();
             
-            // Set up admin button events
-            document.getElementById('export-data').addEventListener('click', exportData);
-            document.getElementById('backup-db').addEventListener('click', backupDatabase);
-        }
-        
-        async function fetchAdminData() {
-            try {
-                const response = await fetch(`${API_BASE_URL}/api/admin/stats`);
-                const data = await response.json();
+            expenseChart.data.datasets[0].data = expenseSums;
+            expenseChart.update();
+            
+            // Update records table
+            const tableBody = document.querySelector('#records-table tbody');
+            tableBody.innerHTML = '';
+            
+            for (let i = 1; i <= 12; i++) {
+                const month = i.toString();
+                const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                const row = document.createElement('tr');
                 
-                document.getElementById('total-users').textContent = data.totalUsers;
-                document.getElementById('total-records').textContent = data.totalRecords;
-                document.getElementById('server-status').textContent = 'Online';
-            } catch (error) {
-                console.error("Admin data error:", error);
-                document.getElementById('server-status').textContent = 'Error';
-            }
-        }
-        
-        // [All your existing data loading, chart, and report functions remain the same]
-        // Just make sure to include all the previous functionality
-        
-        // New admin functions
-        async function exportData() {
-            if (!isAdmin) return;
-            
-            try {
-                const response = await fetch(`${API_BASE_URL}/api/admin/export`);
-                const data = await response.json();
+                if (yearData[month]) {
+                    const data = yearData[month];
+                    const expenses = data.emi + data.food + data.fuel + data.parents + data.other;
+                    const balance = data.salary - expenses;
+                    
+                    row.innerHTML = `
+                        <td>${monthNames[i-1]}</td>
+                        <td>₹${data.salary.toLocaleString()}</td>
+                        <td>₹${data.emi.toLocaleString()}</td>
+                        <td>₹${data.food.toLocaleString()}</td>
+                        <td>₹${data.fuel.toLocaleString()}</td>
+                        <td>₹${data.parents.toLocaleString()}</td>
+                        <td>₹${data.other.toLocaleString()}</td>
+                        <td>₹${balance.toLocaleString()}</td>
+                        <td>
+                            <button class="edit-btn" data-month="${month}">Edit</button>
+                        </td>
+                    `;
+                } else {
+                    row.innerHTML = `
+                        <td>${monthNames[i-1]}</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>
+                            <button class="add-btn" data-month="${month}">Add</button>
+                        </td>
+                    `;
+                }
                 
-                // Create download link
-                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `expense-data-${new Date().toISOString()}.json`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-            } catch (error) {
-                alert('Export failed: ' + error.message);
+                tableBody.appendChild(row);
             }
-        }
-        
-        async function backupDatabase() {
-            if (!isAdmin) return;
             
-            try {
-                const response = await fetch(`${API_BASE_URL}/api/admin/backup`, {
-                    method: 'POST'
+            // Add event listeners to action buttons
+            document.querySelectorAll('.edit-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    monthSelect.value = btn.dataset.month;
+                    yearInput.value = year;
+                    loadMonthData();
+                    document.querySelector('.tab.active').click();
                 });
-                
-                if (response.ok) {
-                    alert('Backup created successfully!');
-                } else {
-                    throw new Error(await response.text());
-                }
-            } catch (error) {
-                alert('Backup failed: ' + error.message);
-            }
+            });
+            
+            document.querySelectorAll('.add-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    monthSelect.value = btn.dataset.month;
+                    yearInput.value = year;
+                    document.getElementById('salary').focus();
+                    document.querySelector('.tab.active').click();
+                });
+            });
         }
         
-        // Start the application with login screen
-        adminBadge.style.display = 'none';
+        function updateAdminDashboard() {
+            // In a real app, this would fetch data from the server
+            let totalRecords = 0;
+            let totalSalary = 0;
+            let totalExpenses = 0;
+            
+            for (const year in expensesData) {
+                for (const month in expensesData[year]) {
+                    totalRecords++;
+                    const data = expensesData[year][month];
+                    totalSalary += data.salary;
+                    totalExpenses += data.emi + data.food + data.fuel + data.parents + data.other;
+                }
+            }
+            
+            document.getElementById('total-users').textContent = '1';
+            document.getElementById('total-records').textContent = totalRecords;
+            document.getElementById('admin-avg-salary').textContent = 
+                totalRecords > 0 ? `₹${Math.round(totalSalary / totalRecords).toLocaleString()}` : '₹0';
+            document.getElementById('admin-avg-expenses').textContent = 
+                totalRecords > 0 ? `₹${Math.round(totalExpenses / totalRecords).toLocaleString()}` : '₹0';
+            
+            // Export buttons
+            document.getElementById('export-csv').addEventListener('click', exportToCSV);
+            document.getElementById('export-json').addEventListener('click', exportToJSON);
+        }
+        
+        function exportToCSV() {
+            alert('CSV export would be generated here');
+            // In a real app, this would generate a proper CSV file
+        }
+        
+        function exportToJSON() {
+            const dataStr = JSON.stringify(expensesData, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const exportFileDefaultName = 'expenses-data.json';
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+        }
     </script>
 </body>
 </html>
