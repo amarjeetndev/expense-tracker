@@ -3,16 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monthly Expense Tracker</title>
+    <title>Green Expense Tracker</title>
     <style>
         :root {
-            --primary: #4361ee;
-            --secondary: #3f37c9;
-            --danger: #f72585;
-            --success: #4cc9f0;
+            --primary: #2e7d32;
+            --primary-light: #4caf50;
+            --primary-dark: #1b5e20;
+            --secondary: #689f38;
+            --danger: #c62828;
+            --success: #2e7d32;
             --light: #f8f9fa;
             --dark: #212529;
-            --admin: #6a1b9a;
+            --admin: #5d4037;
+            --chart-1: #2e7d32;
+            --chart-2: #689f38;
+            --chart-3: #8bc34a;
+            --chart-4: #cddc39;
+            --chart-5: #ffeb3b;
         }
         
         * {
@@ -57,11 +64,16 @@
             border-bottom: none;
             margin-right: 5px;
             border-radius: 5px 5px 0 0;
+            transition: all 0.3s;
         }
         
         .tab.active {
             background-color: var(--primary);
             color: white;
+        }
+        
+        .tab:hover:not(.active) {
+            background-color: #e0e0e0;
         }
         
         .tab-content {
@@ -106,7 +118,15 @@
         }
         
         button:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        button.secondary {
             background-color: var(--secondary);
+        }
+        
+        button.secondary:hover {
+            background-color: #558b2f;
         }
         
         table {
@@ -178,12 +198,39 @@
             display: none;
         }
         
+        .success-message {
+            color: var(--success);
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid var(--success);
+            border-radius: 4px;
+            display: none;
+        }
+        
         .admin-panel {
             background-color: var(--admin);
             color: white;
             padding: 15px;
             border-radius: 5px;
             margin-bottom: 20px;
+        }
+        
+        .stats-card {
+            background-color: var(--primary-light);
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        
+        .stats-card h4 {
+            margin-bottom: 5px;
+            font-size: 16px;
+        }
+        
+        .stats-card p {
+            font-size: 24px;
+            font-weight: bold;
         }
         
         @media (max-width: 768px) {
@@ -195,12 +242,21 @@
                 flex-direction: column;
                 gap: 10px;
             }
+            
+            .tabs {
+                flex-wrap: wrap;
+            }
+            
+            .tab {
+                margin-bottom: 5px;
+            }
         }
     </style>
 </head>
 <body>
     <header>
-        <h1>Monthly Expense Tracker</h1>
+        <h1>Green Expense Tracker</h1>
+        <p>Track your finances sustainably</p>
     </header>
     
     <div class="container">
@@ -213,6 +269,7 @@
         <!-- Data Entry Tab -->
         <div class="tab-content active" id="data-entry">
             <div id="error-message" class="error-message"></div>
+            <div id="success-message" class="success-message"></div>
             
             <div class="form-group">
                 <label for="month">Select Month:</label>
@@ -234,43 +291,44 @@
             
             <div class="form-group">
                 <label for="year">Year:</label>
-                <input type="number" id="year" min="2000" max="2100" value="2023">
+                <input type="number" id="year" min="2000" max="2100" value="2024">
             </div>
             
             <div class="form-group">
                 <label for="salary">Monthly Salary:</label>
-                <input type="number" id="salary" placeholder="Enter your monthly salary">
+                <input type="number" id="salary" placeholder="Enter your monthly salary" required>
             </div>
             
             <h3>Expenses</h3>
             
             <div class="form-group">
                 <label for="emi">EMI:</label>
-                <input type="number" id="emi" placeholder="Enter EMI amount">
+                <input type="number" id="emi" placeholder="Enter EMI amount" min="0">
             </div>
             
             <div class="form-group">
                 <label for="food">Food:</label>
-                <input type="number" id="food" placeholder="Enter food expenses">
+                <input type="number" id="food" placeholder="Enter food expenses" min="0">
             </div>
             
             <div class="form-group">
                 <label for="fuel">Fuel:</label>
-                <input type="number" id="fuel" placeholder="Enter fuel expenses">
+                <input type="number" id="fuel" placeholder="Enter fuel expenses" min="0">
             </div>
             
             <div class="form-group">
                 <label for="parents">Parents:</label>
-                <input type="number" id="parents" placeholder="Enter amount sent to parents">
+                <input type="number" id="parents" placeholder="Enter amount sent to parents" min="0">
             </div>
             
             <div class="form-group">
                 <label for="other">Other Expenses:</label>
-                <input type="number" id="other" placeholder="Enter other expenses">
+                <input type="number" id="other" placeholder="Enter other expenses" min="0">
             </div>
             
             <button id="save-btn">Save Data</button>
             <button id="update-btn" style="display: none;">Update Data</button>
+            <button id="clear-btn" class="secondary">Clear Form</button>
         </div>
         
         <!-- Reports Tab -->
@@ -279,8 +337,7 @@
                 <div>
                     <label for="report-year">Select Year:</label>
                     <select id="report-year">
-                        <option value="2023">2023</option>
-                        <option value="2024">2024</option>
+                        <!-- Years will be populated dynamically -->
                     </select>
                 </div>
                 <div class="month-nav">
@@ -292,20 +349,20 @@
             <div class="summary-card">
                 <h3>Annual Summary</h3>
                 <div class="summary-grid">
-                    <div>
+                    <div class="stats-card">
                         <h4>Total Salary</h4>
                         <p id="total-salary">₹0</p>
                     </div>
-                    <div>
+                    <div class="stats-card">
                         <h4>Total Expenses</h4>
                         <p id="total-expenses">₹0</p>
                     </div>
-                    <div>
+                    <div class="stats-card">
                         <h4>Total Savings</h4>
                         <p id="total-savings">₹0</p>
                     </div>
-                    <div>
-                        <h4>Average Monthly Savings</h4>
+                    <div class="stats-card">
+                        <h4>Avg Monthly Savings</h4>
                         <p id="avg-savings">₹0</p>
                     </div>
                 </div>
@@ -362,19 +419,19 @@
                 <div class="summary-card">
                     <h3>System Statistics</h3>
                     <div class="summary-grid">
-                        <div>
+                        <div class="stats-card">
                             <h4>Total Users</h4>
                             <p id="total-users">0</p>
                         </div>
-                        <div>
+                        <div class="stats-card">
                             <h4>Total Records</h4>
                             <p id="total-records">0</p>
                         </div>
-                        <div>
+                        <div class="stats-card">
                             <h4>Avg. Monthly Salary</h4>
                             <p id="admin-avg-salary">₹0</p>
                         </div>
-                        <div>
+                        <div class="stats-card">
                             <h4>Avg. Monthly Expenses</h4>
                             <p id="admin-avg-expenses">₹0</p>
                         </div>
@@ -382,35 +439,33 @@
                 </div>
                 
                 <div class="summary-card">
-                    <h3>Data Export</h3>
-                    <button id="export-csv">Export to CSV</button>
-                    <button id="export-json">Export to JSON</button>
+                    <h3>Data Management</h3>
+                    <button id="export-csv" class="secondary">Export to CSV</button>
+                    <button id="export-json" class="secondary">Export to JSON</button>
+                    <button id="export-pdf" class="secondary">Export to PDF</button>
+                    <button id="clear-data" style="background-color: var(--danger);">Clear All Data</button>
                 </div>
             </div>
         </div>
     </div>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
     <script>
-        // API Configuration
+        // API Configuration (would be used in a real backend integration)
         const API_BASE_URL = 'https://expense-tracker-backend-djyp.onrender.com';
         const USER_ID = '1';
-        const ADMIN_PASSWORD = 'admin123'; // Change this in production
         
-        // Sample data structure
-        let expensesData = {
-            "2023": {
-                "1": { salary: 50000, emi: 15000, food: 8000, fuel: 3000, parents: 5000, other: 2000 },
-                "2": { salary: 50000, emi: 15000, food: 7500, fuel: 3500, parents: 5000, other: 2500 }
-            },
-            "2024": {}
-        };
+        // Initialize with sample data or load from localStorage
+        let expensesData = {};
         
         // DOM Elements
         const tabs = document.querySelectorAll('.tab');
         const tabContents = document.querySelectorAll('.tab-content');
         const saveBtn = document.getElementById('save-btn');
         const updateBtn = document.getElementById('update-btn');
+        const clearBtn = document.getElementById('clear-btn');
         const monthSelect = document.getElementById('month');
         const yearInput = document.getElementById('year');
         const reportYearSelect = document.getElementById('report-year');
@@ -418,6 +473,8 @@
         const nextYearBtn = document.getElementById('next-year');
         const adminLoginBtn = document.getElementById('admin-login');
         const adminFeatures = document.getElementById('admin-features');
+        const errorMessage = document.getElementById('error-message');
+        const successMessage = document.getElementById('success-message');
         
         // Initialize Charts
         const monthlyChart = new Chart(
@@ -430,17 +487,17 @@
                         {
                             label: 'Salary',
                             data: [],
-                            backgroundColor: 'rgba(67, 97, 238, 0.7)'
+                            backgroundColor: 'rgba(46, 125, 50, 0.7)'
                         },
                         {
                             label: 'Expenses',
                             data: [],
-                            backgroundColor: 'rgba(247, 37, 133, 0.7)'
+                            backgroundColor: 'rgba(244, 67, 54, 0.7)'
                         },
                         {
                             label: 'Balance',
                             data: [],
-                            backgroundColor: 'rgba(76, 201, 240, 0.7)'
+                            backgroundColor: 'rgba(104, 159, 56, 0.7)'
                         }
                     ]
                 },
@@ -448,7 +505,26 @@
                     responsive: true,
                     scales: {
                         y: {
-                            beginAtZero: true
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Amount (₹)'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Month'
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ₹' + context.raw.toLocaleString();
+                                }
+                            }
                         }
                     }
                 }
@@ -464,72 +540,132 @@
                     datasets: [{
                         data: [],
                         backgroundColor: [
-                            'rgba(67, 97, 238, 0.7)',
-                            'rgba(63, 55, 201, 0.7)',
-                            'rgba(247, 37, 133, 0.7)',
-                            'rgba(76, 201, 240, 0.7)',
-                            'rgba(33, 37, 41, 0.7)'
+                            'rgba(46, 125, 50, 0.7)',
+                            'rgba(104, 159, 56, 0.7)',
+                            'rgba(139, 195, 74, 0.7)',
+                            'rgba(205, 220, 57, 0.7)',
+                            'rgba(255, 235, 59, 0.7)'
                         ]
                     }]
                 },
                 options: {
-                    responsive: true
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.raw || 0;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = Math.round((value / total) * 100);
+                                    return `${label}: ₹${value.toLocaleString()} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
                 }
             }
         );
         
-        // Tab Switching
-        tabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                tabs.forEach(t => t.classList.remove('active'));
-                tabContents.forEach(c => c.classList.remove('active'));
-                
-                tab.classList.add('active');
-                document.getElementById(tab.dataset.tab).classList.add('active');
-                
-                if (tab.dataset.tab === 'reports') {
+        // Initialize the application
+        function init() {
+            loadFromLocalStorage();
+            setupEventListeners();
+            updateYearDropdown();
+            loadMonthData();
+        }
+        
+        // Set up all event listeners
+        function setupEventListeners() {
+            // Tab Switching
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tabContents.forEach(c => c.classList.remove('active'));
+                    
+                    tab.classList.add('active');
+                    document.getElementById(tab.dataset.tab).classList.add('active');
+                    
+                    if (tab.dataset.tab === 'reports') {
+                        updateReports();
+                    }
+                });
+            });
+            
+            // Form Submission
+            saveBtn.addEventListener('click', saveData);
+            updateBtn.addEventListener('click', updateData);
+            clearBtn.addEventListener('click', clearForm);
+            
+            // Report Navigation
+            prevYearBtn.addEventListener('click', () => {
+                const years = getAvailableYears();
+                const currentIndex = years.indexOf(reportYearSelect.value);
+                if (currentIndex > 0) {
+                    reportYearSelect.value = years[currentIndex - 1];
                     updateReports();
                 }
             });
-        });
+            
+            nextYearBtn.addEventListener('click', () => {
+                const years = getAvailableYears();
+                const currentIndex = years.indexOf(reportYearSelect.value);
+                if (currentIndex < years.length - 1) {
+                    reportYearSelect.value = years[currentIndex + 1];
+                    updateReports();
+                }
+            });
+            
+            // Admin Login
+            adminLoginBtn.addEventListener('click', adminLogin);
+            
+            // Month Selection - Load existing data if available
+            monthSelect.addEventListener('change', loadMonthData);
+            yearInput.addEventListener('change', loadMonthData);
+            
+            // Export buttons
+            document.getElementById('export-csv')?.addEventListener('click', exportToCSV);
+            document.getElementById('export-json')?.addEventListener('click', exportToJSON);
+            document.getElementById('export-pdf')?.addEventListener('click', exportToPDF);
+            document.getElementById('clear-data')?.addEventListener('click', clearAllData);
+        }
         
-        // Form Submission
-        saveBtn.addEventListener('click', saveData);
-        updateBtn.addEventListener('click', updateData);
-        
-        // Report Navigation
-        prevYearBtn.addEventListener('click', () => {
-            reportYearSelect.value = parseInt(reportYearSelect.value) - 1;
-            updateReports();
-        });
-        
-        nextYearBtn.addEventListener('click', () => {
-            reportYearSelect.value = parseInt(reportYearSelect.value) + 1;
-            updateReports();
-        });
-        
-        // Admin Login
-        adminLoginBtn.addEventListener('click', () => {
-            const password = document.getElementById('admin-password').value;
-            if (password === ADMIN_PASSWORD) {
-                adminFeatures.style.display = 'block';
-                document.getElementById('admin-error').style.display = 'none';
-                updateAdminDashboard();
+        // Data Management Functions
+        function loadFromLocalStorage() {
+            const savedData = localStorage.getItem(`expensesData_${USER_ID}`);
+            if (savedData) {
+                expensesData = JSON.parse(savedData);
             } else {
-                document.getElementById('admin-error').textContent = 'Incorrect password';
-                document.getElementById('admin-error').style.display = 'block';
+                // Initialize with sample data if no saved data exists
+                expensesData = {
+                    "2023": {
+                        "1": { salary: 50000, emi: 15000, food: 8000, fuel: 3000, parents: 5000, other: 2000 },
+                        "2": { salary: 50000, emi: 15000, food: 7500, fuel: 3500, parents: 5000, other: 2500 }
+                    },
+                    "2024": {}
+                };
+                saveToLocalStorage();
             }
-        });
+        }
         
-        // Month Selection - Load existing data if available
-        monthSelect.addEventListener('change', loadMonthData);
-        yearInput.addEventListener('change', loadMonthData);
+        function saveToLocalStorage() {
+            localStorage.setItem(`expensesData_${USER_ID}`, JSON.stringify(expensesData));
+        }
         
-        // Initialize
-        loadMonthData();
-        updateReports();
+        function clearAllData() {
+            if (confirm('Are you sure you want to delete ALL data? This cannot be undone.')) {
+                expensesData = {};
+                saveToLocalStorage();
+                updateReports();
+                updateAdminDashboard();
+                showSuccess('All data has been cleared');
+            }
+        }
         
-        // Functions
+        // Form Functions
         function loadMonthData() {
             const month = monthSelect.value;
             const year = yearInput.value;
@@ -537,31 +673,56 @@
             if (expensesData[year] && expensesData[year][month]) {
                 const data = expensesData[year][month];
                 document.getElementById('salary').value = data.salary;
-                document.getElementById('emi').value = data.emi;
-                document.getElementById('food').value = data.food;
-                document.getElementById('fuel').value = data.fuel;
-                document.getElementById('parents').value = data.parents;
-                document.getElementById('other').value = data.other;
+                document.getElementById('emi').value = data.emi || '';
+                document.getElementById('food').value = data.food || '';
+                document.getElementById('fuel').value = data.fuel || '';
+                document.getElementById('parents').value = data.parents || '';
+                document.getElementById('other').value = data.other || '';
                 
                 saveBtn.style.display = 'none';
                 updateBtn.style.display = 'inline-block';
             } else {
-                document.getElementById('salary').value = '';
-                document.getElementById('emi').value = '';
-                document.getElementById('food').value = '';
-                document.getElementById('fuel').value = '';
-                document.getElementById('parents').value = '';
-                document.getElementById('other').value = '';
-                
-                saveBtn.style.display = 'inline-block';
-                updateBtn.style.display = 'none';
+                clearForm();
             }
         }
         
+        function clearForm() {
+            document.getElementById('salary').value = '';
+            document.getElementById('emi').value = '';
+            document.getElementById('food').value = '';
+            document.getElementById('fuel').value = '';
+            document.getElementById('parents').value = '';
+            document.getElementById('other').value = '';
+            
+            saveBtn.style.display = 'inline-block';
+            updateBtn.style.display = 'none';
+        }
+        
+        function validateInputs() {
+            const salary = document.getElementById('salary').value;
+            if (!salary || isNaN(salary) || parseFloat(salary) <= 0) {
+                showError('Please enter a valid salary amount');
+                return false;
+            }
+            
+            const inputs = ['emi', 'food', 'fuel', 'parents', 'other'];
+            for (const inputId of inputs) {
+                const value = document.getElementById(inputId).value;
+                if (value && (isNaN(value) || parseFloat(value) < 0)) {
+                    showError(`Please enter a valid amount for ${inputId}`);
+                    return false;
+                }
+            }
+            
+            return true;
+        }
+        
         function saveData() {
+            if (!validateInputs()) return;
+            
             const month = monthSelect.value;
             const year = yearInput.value;
-            const salary = parseFloat(document.getElementById('salary').value) || 0;
+            const salary = parseFloat(document.getElementById('salary').value);
             const emi = parseFloat(document.getElementById('emi').value) || 0;
             const food = parseFloat(document.getElementById('food').value) || 0;
             const fuel = parseFloat(document.getElementById('fuel').value) || 0;
@@ -576,13 +737,32 @@
                 salary, emi, food, fuel, parents, other
             };
             
-            alert('Data saved successfully!');
+            saveToLocalStorage();
+            showSuccess('Data saved successfully!');
             loadMonthData();
             updateReports();
+            updateYearDropdown();
         }
         
         function updateData() {
             saveData(); // Same as save for this implementation
+        }
+        
+        // Report Functions
+        function getAvailableYears() {
+            return Object.keys(expensesData).sort((a, b) => parseInt(a) - parseInt(b));
+        }
+        
+        function updateYearDropdown() {
+            const years = getAvailableYears();
+            reportYearSelect.innerHTML = years.map(year => 
+                `<option value="${year}">${year}</option>`
+            ).join('');
+            
+            // Set to most recent year if available
+            if (years.length > 0) {
+                reportYearSelect.value = years[years.length - 1];
+            }
         }
         
         function updateReports() {
@@ -593,10 +773,11 @@
             let totalSalary = 0;
             let totalExpenses = 0;
             let monthlyData = Array(12).fill(0).map((_, i) => {
-                const month = (i + 1).toString();
+                const month = (i + 1).toString().padStart(2, '0');
                 if (yearData[month]) {
                     const data = yearData[month];
-                    const expenses = data.emi + data.food + data.fuel + data.parents + data.other;
+                    const expenses = (data.emi || 0) + (data.food || 0) + (data.fuel || 0) + 
+                                    (data.parents || 0) + (data.other || 0);
                     const balance = data.salary - expenses;
                     
                     totalSalary += data.salary;
@@ -619,7 +800,7 @@
             document.getElementById('total-salary').textContent = `₹${totalSalary.toLocaleString()}`;
             document.getElementById('total-expenses').textContent = `₹${totalExpenses.toLocaleString()}`;
             document.getElementById('total-savings').textContent = `₹${(totalSalary - totalExpenses).toLocaleString()}`;
-            document.getElementById('avg-savings').textContent = `₹${((totalSalary - totalExpenses) / 12).toLocaleString()}`;
+            document.getElementById('avg-savings').textContent = `₹${Math.round((totalSalary - totalExpenses) / 12).toLocaleString()}`;
             
             // Update charts
             monthlyChart.data.datasets[0].data = monthlyData.map(m => m.salary);
@@ -641,23 +822,24 @@
             tableBody.innerHTML = '';
             
             for (let i = 1; i <= 12; i++) {
-                const month = i.toString();
+                const month = i.toString().padStart(2, '0');
                 const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
                 const row = document.createElement('tr');
                 
                 if (yearData[month]) {
                     const data = yearData[month];
-                    const expenses = data.emi + data.food + data.fuel + data.parents + data.other;
+                    const expenses = (data.emi || 0) + (data.food || 0) + (data.fuel || 0) + 
+                                      (data.parents || 0) + (data.other || 0);
                     const balance = data.salary - expenses;
                     
                     row.innerHTML = `
                         <td>${monthNames[i-1]}</td>
                         <td>₹${data.salary.toLocaleString()}</td>
-                        <td>₹${data.emi.toLocaleString()}</td>
-                        <td>₹${data.food.toLocaleString()}</td>
-                        <td>₹${data.fuel.toLocaleString()}</td>
-                        <td>₹${data.parents.toLocaleString()}</td>
-                        <td>₹${data.other.toLocaleString()}</td>
+                        <td>₹${(data.emi || 0).toLocaleString()}</td>
+                        <td>₹${(data.food || 0).toLocaleString()}</td>
+                        <td>₹${(data.fuel || 0).toLocaleString()}</td>
+                        <td>₹${(data.parents || 0).toLocaleString()}</td>
+                        <td>₹${(data.other || 0).toLocaleString()}</td>
                         <td>₹${balance.toLocaleString()}</td>
                         <td>
                             <button class="edit-btn" data-month="${month}">Edit</button>
@@ -688,7 +870,7 @@
                     monthSelect.value = btn.dataset.month;
                     yearInput.value = year;
                     loadMonthData();
-                    document.querySelector('.tab.active').click();
+                    document.querySelector('.tab[data-tab="data-entry"]').click();
                 });
             });
             
@@ -697,13 +879,25 @@
                     monthSelect.value = btn.dataset.month;
                     yearInput.value = year;
                     document.getElementById('salary').focus();
-                    document.querySelector('.tab.active').click();
+                    document.querySelector('.tab[data-tab="data-entry"]').click();
                 });
             });
         }
         
+        // Admin Functions
+        function adminLogin() {
+            const password = document.getElementById('admin-password').value;
+            if (password === 'admin123') { // In production, this would be server-side
+                adminFeatures.style.display = 'block';
+                document.getElementById('admin-error').style.display = 'none';
+                updateAdminDashboard();
+            } else {
+                document.getElementById('admin-error').textContent = 'Incorrect password';
+                document.getElementById('admin-error').style.display = 'block';
+            }
+        }
+        
         function updateAdminDashboard() {
-            // In a real app, this would fetch data from the server
             let totalRecords = 0;
             let totalSalary = 0;
             let totalExpenses = 0;
@@ -713,7 +907,8 @@
                     totalRecords++;
                     const data = expensesData[year][month];
                     totalSalary += data.salary;
-                    totalExpenses += data.emi + data.food + data.fuel + data.parents + data.other;
+                    totalExpenses += (data.emi || 0) + (data.food || 0) + (data.fuel || 0) + 
+                                    (data.parents || 0) + (data.other || 0);
                 }
             }
             
@@ -723,28 +918,132 @@
                 totalRecords > 0 ? `₹${Math.round(totalSalary / totalRecords).toLocaleString()}` : '₹0';
             document.getElementById('admin-avg-expenses').textContent = 
                 totalRecords > 0 ? `₹${Math.round(totalExpenses / totalRecords).toLocaleString()}` : '₹0';
-            
-            // Export buttons
-            document.getElementById('export-csv').addEventListener('click', exportToCSV);
-            document.getElementById('export-json').addEventListener('click', exportToJSON);
         }
         
+        // Export Functions
         function exportToCSV() {
-            alert('CSV export would be generated here');
-            // In a real app, this would generate a proper CSV file
+            let csvContent = "Year,Month,Salary,EMI,Food,Fuel,Parents,Other,Expenses,Balance\n";
+            
+            for (const year in expensesData) {
+                for (const month in expensesData[year]) {
+                    const data = expensesData[year][month];
+                    const expenses = (data.emi || 0) + (data.food || 0) + (data.fuel || 0) + 
+                                    (data.parents || 0) + (data.other || 0);
+                    const balance = data.salary - expenses;
+                    
+                    csvContent += `${year},${month},${data.salary},${data.emi || 0},${data.food || 0},` +
+                                 `${data.fuel || 0},${data.parents || 0},${data.other || 0},` +
+                                 `${expenses},${balance}\n`;
+                }
+            }
+            
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.setAttribute('href', url);
+            link.setAttribute('download', `expense_data_${new Date().toISOString().slice(0,10)}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showSuccess('CSV exported successfully!');
         }
         
         function exportToJSON() {
             const dataStr = JSON.stringify(expensesData, null, 2);
             const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
             
-            const exportFileDefaultName = 'expenses-data.json';
+            const exportFileDefaultName = `expense_data_${new Date().toISOString().slice(0,10)}.json`;
             
             const linkElement = document.createElement('a');
             linkElement.setAttribute('href', dataUri);
             linkElement.setAttribute('download', exportFileDefaultName);
             linkElement.click();
+            
+            showSuccess('JSON exported successfully!');
         }
+        
+        function exportToPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Add title
+            doc.setFontSize(20);
+            doc.setTextColor(46, 125, 50);
+            doc.text('Expense Tracker Report', 105, 15, { align: 'center' });
+            
+            // Add date
+            doc.setFontSize(12);
+            doc.setTextColor(0, 0, 0);
+            doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 105, 25, { align: 'center' });
+            
+            // Add summary table
+            doc.autoTable({
+                startY: 30,
+                head: [['Year', 'Month', 'Salary', 'Expenses', 'Balance']],
+                body: getPDFTableData(),
+                theme: 'grid',
+                headStyles: {
+                    fillColor: [46, 125, 50],
+                    textColor: 255
+                },
+                styles: {
+                    cellPadding: 3,
+                    fontSize: 10
+                }
+            });
+            
+            // Save the PDF
+            doc.save(`expense_report_${new Date().toISOString().slice(0,10)}.pdf`);
+            
+            showSuccess('PDF exported successfully!');
+        }
+        
+        function getPDFTableData() {
+            const tableData = [];
+            
+            for (const year in expensesData) {
+                for (const month in expensesData[year]) {
+                    const data = expensesData[year][month];
+                    const expenses = (data.emi || 0) + (data.food || 0) + (data.fuel || 0) + 
+                                    (data.parents || 0) + (data.other || 0);
+                    const balance = data.salary - expenses;
+                    
+                    tableData.push([
+                        year,
+                        getMonthName(month),
+                        '₹' + data.salary.toLocaleString(),
+                        '₹' + expenses.toLocaleString(),
+                        '₹' + balance.toLocaleString()
+                    ]);
+                }
+            }
+            
+            return tableData;
+        }
+        
+        function getMonthName(monthNum) {
+            const months = ['January', 'February', 'March', 'April', 'May', 'June', 
+                            'July', 'August', 'September', 'October', 'November', 'December'];
+            return months[parseInt(monthNum) - 1] || monthNum;
+        }
+        
+        // Utility Functions
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+            setTimeout(() => errorMessage.style.display = 'none', 5000);
+        }
+        
+        function showSuccess(message) {
+            successMessage.textContent = message;
+            successMessage.style.display = 'block';
+            setTimeout(() => successMessage.style.display = 'none', 5000);
+        }
+        
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>
